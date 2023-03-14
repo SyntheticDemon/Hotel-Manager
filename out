@@ -1,0 +1,95 @@
+Initialized server with current state
+Users :{
+    "users": [
+        {
+            "admin": "true",
+            "id": 0,
+            "logged_in": false,
+            "password": "admin",
+            "user": "Admin"
+        },
+        {
+            "address": "Canada, Montral",
+            "admin": "false",
+            "id": 1,
+            "logged_in": false,
+            "password": "1234",
+            "phoneNumber": "00945692356",
+            "purse": "1000",
+            "user": "Morad"
+        },
+        {
+            "address": "United States, Newyork",
+            "admin": "false",
+            "id": 2,
+            "logged_in": false,
+            "password": "4321",
+            "phoneNumber": "00125692356",
+            "purse": "200",
+            "user": "Jasem"
+        },
+        {
+            "address": "Iran, Rasht",
+            "admin": "false",
+            "id": 3,
+            "logged_in": false,
+            "password": "6789",
+            "phoneNumber": "00989112659874",
+            "purse": "100",
+            "user": "Pedram"
+        }
+    ]
+}
+Rooms:{
+    "rooms": [
+        {
+            "max_capacity": 2,
+            "number": "101",
+            "price": 100,
+            "status": 0,
+            "users": []
+        }
+    ]
+}
+Config :{
+    "users": [
+        {
+            "admin": "true",
+            "id": 0,
+            "logged_in": false,
+            "password": "admin",
+            "user": "Admin"
+        },
+        {
+            "address": "Canada, Montral",
+            "admin": "false",
+            "id": 1,
+            "logged_in": false,
+            "password": "1234",
+            "phoneNumber": "00945692356",
+            "purse": "1000",
+            "user": "Morad"
+        },
+        {
+            "address": "United States, Newyork",
+            "admin": "false",
+            "id": 2,
+            "logged_in": false,
+            "password": "4321",
+            "phoneNumber": "00125692356",
+            "purse": "200",
+            "user": "Jasem"
+        },
+        {
+            "address": "Iran, Rasht",
+            "admin": "false",
+            "id": 3,
+            "logged_in": false,
+            "password": "6789",
+            "phoneNumber": "00989112659874",
+            "purse": "100",
+            "user": "Pedram"
+        }
+    ]
+}
+Enter initial date 

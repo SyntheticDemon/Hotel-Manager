@@ -1,0 +1,36 @@
+{
+    "rooms": [
+        {
+            "capacity": 2,
+            "maxCapacity": 2,
+            "number": "101",
+            "price": 100,
+            "status": 0,
+            "users": []
+        },
+        {
+            "capacity": 2,
+            "maxCapacity": 3,
+            "number": "102",
+            "price": 73,
+            "status": 0,
+            "users": []
+        },
+        {
+            "capacity": 0,
+            "maxCapacity": 2,
+            "number": "201",
+            "price": 100,
+            "status": 1,
+            "users": []
+        },
+        {
+            "capacity": 0,
+            "maxCapacity": 1,
+            "number": "301",
+            "price": 100,
+            "status": 0,
+            "users": []
+        }
+    ]
+}

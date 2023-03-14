@@ -1,10 +1,12 @@
-all: server client 
-utils : utils.cpp 
-	g++ utils.cpp -o utils
-client : client.cpp utils.cpp
-	g++  client.cpp -o client
-server : server.cpp utils.cpp
-	g++  server.cpp -o server
-.PHONY: clean
+all : server client
+
+server : server.cpp 
+	g++ -o server.o  server.cpp 
+client:
+	g++ client.cpp -o client.o
+
+.PHONEY: clean
+
 clean:
-	rm server client.
+	rm *.o
+

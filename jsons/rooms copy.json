@@ -1,0 +1,57 @@
+{
+    "rooms": [{
+            "capacity": 2,
+            "maxCapacity": 2,
+            "number": "101",
+            "price": 100,
+            "status": 0,
+            "users": []
+        },
+        {
+            "capacity": 2,
+            "maxCapacity": 3,
+            "number": "102",
+            "price": 73,
+            "status": 0,
+            "users": [{
+                "bed_count": 1,
+                "check_in_date": "2023-02-25",
+                "checkout_date": "2023-02-27",
+                "id": 1
+            }]
+        },
+        {
+            "capacity": 0,
+            "maxCapacity": 2,
+            "number": "201",
+            "price": 100,
+            "status": 1,
+            "users": [{
+                "bed_count": 2,
+                "check_in_date": "2023-02-25",
+                "checkout_date": "2023-02-27",
+                "id": 2
+            }]
+        },
+        {
+            "capacity": 0,
+            "maxCapacity": 1,
+            "number": "301",
+            "price": 100,
+            "status": 0,
+            "users": [{
+                    "bed_count": 1,
+                    "check_in_date": "2023-02-28",
+                    "checkout_date": "2023-02-28",
+                    "id": 2
+                },
+                {
+                    "bed_count": 1,
+                    "check_in_date": "2023-02-25",
+                    "checkout_date": "2023-02-26",
+                    "id": 3
+                }
+            ]
+        }
+    ]
+}
