@@ -104,9 +104,6 @@ public:
         pthread_mutex_lock(&this->data_lock);
         this->rooms = new_rooms;
         pthread_mutex_unlock(&this->data_lock);
-        ofstream rooms_f(this->rooms_file_location);
-        rooms_f << this->rooms.dump(4);
-        // persist data in the disk after each update
     }
     void set_configs(json new_config)
     {
@@ -119,15 +116,9 @@ public:
         pthread_mutex_lock(&this->data_lock);
         this->users = new_users;
         pthread_mutex_unlock(&this->data_lock);
-        ofstream users_f(this->users_file_location);
-        users_f << this->users.dump(4);
-        // persist data in the disk after each update
     }
 
 private:
-    string users_file_location;
-    string config_file_location;
-    string rooms_file_location;
     json users;
     json config;
     json rooms;
@@ -228,7 +219,6 @@ json logout_repsonse(json request, Server *serv)
     }
     return response;
 }
-
 json login_response(json request, Server *serv)
 {
     json response;
@@ -255,78 +245,6 @@ json login_response(json request, Server *serv)
     {
         response["code"] = 430;
         response["message"] = "Log in failed";
-    }
-    return response;
-}
-
-json view_user_information_response(json request, Server *serv)
-{
-    json response;
-    string request_username = request.at("payload").at("username");
-    json target_user = search_json(request_username, "user", "users", serv->get_users());
-    if (target_user != nullptr)
-    {
-        if (target_user["logged_in"] == true)
-        {
-            response["code"] = 230;
-            response["user"] = target_user;
-            response["message"] = "User information Retrived succesfully";
-        }
-        else
-        {
-            response["code"] = 430;
-            response["message"] = "You are not logged in ";
-        }
-    }
-    else
-    {
-        response["code"] = 404;
-        response["message"] = "Not logged in or user not found";
-    }
-    return response;
-}
-
-void remove_password_from_users(json &users)
-{
-    for (auto &v : users.at("users"))
-    {
-        v.erase("password");
-    }
-}
-
-json all_users_response(json request, Server *serv)
-{
-    json response;
-    string request_username = request.at("payload").at("username");
-    json target_user = search_json(request_username, "user", "users", serv->get_users());
-    json user_backup = serv->get_users();
-    remove_password_from_users(user_backup);
-    if (target_user != nullptr)
-    {
-        if (target_user["logged_in"] == true)
-        {
-            if (target_user["admin"] == "true")
-            {
-                response["code"] = 230;
-                response["users"] = user_backup;
-                response["message"] = "User information Retrived succesfully";
-            }
-            else
-            {
-                response["code"] = 430;
-                response["message"] = "You are not an admin and cannot view all users ";
-            }
-        }
-        else
-        {
-            response["code"] = 430;
-            response["message"] = "You are not logged in ";
-        }
-    }
-    else
-    {
-        response["code"] = 404;
-        response["message"] = "Not logged in or user not found";
     }
     return response;
 }
@@ -397,16 +315,191 @@ json generate_response_fx(json request, Server *serv)
     {
         response = pass_day_response(request, serv);
     }
-    else if (request_type == "view_user_information")
-    {
-        response = view_user_information_response(request, serv);
-    }
-    else if (request_type == "all_users")
-    {
-        response = all_users_response(request, serv);
-    }
     return response;
 }
 void handle_client(Server *serv, int client_fd)
 {
-    cout << "Started Clien
+    cout << "Started Client Thread " << client_fd << endl;
+
+    while (true)
+    {
+        char new_client_buffer[BUFFER_SIZE] = {0};
+        if (read(client_fd, new_client_buffer, BUFFER_SIZE) == 0)
+        {
+
+            cout << "Client FD did not return valid request" << endl;
+            serv->server_disconnect(client_fd);
+            break;
+        }
+        else
+        {
+            std::string cpp_message(new_client_buffer);
+            json request = serv->deserialize(cpp_message);
+            cout << "Received Request : " << request << endl;
+            json response = generate_response_fx(request, serv);
+            cout << "Sending Response : " << response << endl;
+            serv->server_send(client_fd, response);
+        }
+    }
+};
+
+int Server::server_accept(int addrlen, struct sockaddr_in address)
+{
+    int new_socket;
+    if ((new_socket = accept(server_fd, (struct sockaddr *)&address,
+                             (socklen_t *)&addrlen)) < 0)
+    {
+        perror("Failure in Accept");
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        cout << "Allocating Resources for this consumer (A buffer and A thread) " << new_socket << endl;
+        thread th1(handle_client, this, new_socket);
+        th1.detach();
+        // new_client_buffer, new_client_fd
+        // );
+    }
+    return new_socket;
+}
+
+int Server::server_shutdown()
+{
+    return shutdown(this->server_fd, SHUT_RDWR);
+}
+// =========================================================================================== //
+//  Links
+// =========================================================================================== //
+
+int Server::server_send(int client_fd, json jobject)
+{
+
+    string message = this->serialize(jobject);
+    const char *m = message.c_str();
+    return send(client_fd, m, strlen(m), 0);
+}
+
+json Server::server_receive(int client_fd)
+{
+    char temp_buffer[BUFFER_SIZE] = {0};
+
+    if (read(client_fd, temp_buffer, BUFFER_SIZE))
+    {
+        perror("Could not read from client FD");
+    }
+    std::string cpp_message(temp_buffer);
+    json final = this->deserialize(cpp_message);
+    return final;
+}
+
+void Server::run()
+{
+
+    string initial_date;
+    cout << "Enter initial date \n";
+    cin >> initial_date;
+
+    Date curr = Date(initial_date);
+    this->cur = &curr;
+
+    while (true)
+        this->Server::server_accept(sizeof(address), address);
+}
+
+int Server::server_disconnect(int client_fd)
+{
+    return close(client_fd);
+}
+// =========================================================================================== //
+//  Consturctor
+// =========================================================================================== //
+Server::Server(string config_location, string users_location, string rooms_location)
+{
+    int server_fd;
+
+    struct sockaddr_in address;
+    int opt = 1;
+    int addrlen = sizeof(address);
+    this->config = read_json_f(config_location);
+
+    // Creating socket file descriptor
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
+        cout << "Opening socket failed" << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    if (setsockopt(server_fd, SOL_SOCKET,
+                   SO_REUSEADDR | SO_REUSEPORT, &opt,
+                   sizeof(opt)))
+    {
+        cout << "Set socket options failed" << endl;
+        exit(EXIT_FAILURE);
+    }
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(this->config.at("commandChannelPort"));
+    // Forcefully attaching socket to port 8080
+    if (bind(server_fd, (struct sockaddr *)&address,
+             sizeof(address)) < 0)
+    {
+        perror("bind failed");
+        exit(EXIT_FAILURE);
+    }
+    this->rooms = read_json_f(rooms_location);
+    json users = read_json_f(users_location);
+    for (auto &v : users.at("users"))
+    {
+        if (v.contains("logged_in"))
+        {
+        }
+        else
+        {
+            v["logged_in"] = false;
+        }
+    }
+    int peers = this->users.count("users");
+    if (listen(server_fd, peers) < 0)
+    {
+        cout << "Listen Failed" << endl;
+        exit(EXIT_FAILURE);
+    }
+    this->users = users;
+    this->port = port;
+    this->address = address;
+
+    cout << "Initialized server with current state" << endl;
+    cout << "Users :" << this->users.dump() << endl;
+    cout << "Rooms:" << this->rooms.dump() << endl;
+    cout << "Config :" << this->users.dump() << endl;
+
+    this->server_fd = server_fd;
+    // read files
+}
+// =========================================================================================== //
+// =========================================================================================== //
+
+int main(int argc, char const *argv[])
+{
+
+    string users_location = "jsons/users.json";
+    string rooms_location = "jsons/rooms.json";
+    string configs_location = "jsons/config.json";
+    // while (true)
+    // {
+    //     string initial_input;
+    //     cin >> initial_input;
+    //     vector<string> inp = split(initial_input, ' ');
+    //     if (inp[0] == "setTime")
+    //     {
+    //         cout << inp[0];
+    //         initial_date = inp[1];
+    //         break;
+    //     }
+    // }
+    Server new_server = Server(configs_location, users_location, rooms_location);
+
+    new_server.run();
+
+    return 0;
+}
