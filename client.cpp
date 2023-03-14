@@ -9,16 +9,16 @@
 using namespace std;
 void showMenu()
 {
-    cout << "1. View user information" << endl;
-    cout << "2. View all users" << endl;
-    cout << "3. View rooms information" << endl;
-    cout << "4. Booking" << endl;
-    cout << "5. Canceling" << endl;
-    cout << "6. Pass day" << endl;
-    cout << "7. Edit information" << endl;
-    cout << "8. Leaving room" << endl;
-    cout << "9. Rooms" << endl;
-    cout << "0. Logout" << endl;
+    cout << "<< 1. View user information" << endl;
+    cout << "<< 2. View all users" << endl;
+    cout << "<< 3. View rooms information" << endl;
+    cout << "<< 4. Booking" << endl;
+    cout << "<< 5. Canceling" << endl;
+    cout << "<< 6. Pass day" << endl;
+    cout << "<< 7. Edit information" << endl;
+    cout << "<< 8. Leaving room" << endl;
+    cout << "<< 9. Rooms" << endl;
+    cout << "<< 0. Logout" << endl;
     return;
 }
 class Connector
@@ -50,10 +50,15 @@ json Connector::connector_receive()
 
     if (read(this->client_fd, temp_buffer, BUFFER_SIZE))
     {
-        perror("Could not read from client FD");
+        std::string cpp_message(temp_buffer);
+        return json::parse(cpp_message);
     }
-    std::string cpp_message(temp_buffer);
-    return cpp_message;
+    else
+    {
+
+        cout << ("Could not read from server FD") << endl;
+        return nullptr;
+    }
 }
 
 int Connector::connector_disconnect()
@@ -95,21 +100,60 @@ Connector::Connector(string config_location)
     this->client_fd = sock;
 }
 
-
-
-int main(int argc, char const *argv[])
+class Client
 {
-    showMenu();
-    Connector conn = Connector("./jsons/config.json");
-    char *hello = "============ Pouriya Tajmehrabi-----Amin Pourzare ==========\n";
-    // cout << "Enter Command << ";
-    json obj;
-    conn.connector_send(hello);
-    // sleep(2);
-    // send(sock, hello, strlen(hello), 0);
-    // sleep(2);
-    // send(sock, hello, strlen(hello), 0);
+private:
+    Connector *conn;
+    vector<vector<string>> inputs;
 
-    // close(client_fd);
-    return 0;
+public:
+    void run();
+    Client();
+    string active_username;
+    vector<string> receive_and_tokenize_input();
+    json logout(string username);
+    json signup(vector<string> tokens);
+    json login(vector<string> tokens);
+    json all_users(vector<string> tokens);
+    json view_user_information(vector<string> tokens);
+    json pass_day(vector<string> tokens);
+};
+
+json create_request(json payload, json type)
+{
+    json request;
+    request["payload"] = payload;
+    request["type"] = type;
+    return request;
 }
+
+json Client::logout(string username)
+{
+
+    json response;
+    json logout_form;
+    logout_form["username"] = username;
+    json request = create_request(logout_form, "logout");
+    cout << "Sending Request" << logout_form << endl;
+    this->conn->connector_send(request);
+    response = this->conn->connector_receive();
+    cout << "Server Response " << response.dump(4) << endl;
+    return response;
+}
+
+json Client::all_users(vector<string> tokens)
+{
+    json response;
+    json all_users_form;
+    all_users_form["username"] = this->active_username;
+    json request = create_request(all_users_form, "all_users");
+    cout << "Sending Request" << all_users_form << endl;
+    this->conn->connector_send(request);
+    response = this->conn->connector_receive();
+    cout << "Server Response " << response.dump(4) << endl;
+    return response;
+}
+
+json Client::login(vector<string> tokens)
+{
+    j
