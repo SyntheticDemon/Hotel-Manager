@@ -623,7 +623,7 @@ json generate_response_fx(json request, Server *serv)
 }
 void handle_client(Server *serv, int client_fd)
 {
-    cout << getTime() << "Started Client Thread " << client_fd << endl;
+    cout << "Started Client Thread " << client_fd << endl;
 
     while (true)
     {
@@ -631,18 +631,17 @@ void handle_client(Server *serv, int client_fd)
         if (read(client_fd, new_client_buffer, BUFFER_SIZE) == 0)
         {
 
-            cout << getTime() << "Client FD did not return valid request" << endl;
+            cout << "Client FD did not return valid request" << endl;
             serv->server_disconnect(client_fd);
             break;
         }
         else
         {
-
             std::string cpp_message(new_client_buffer);
             json request = serv->deserialize(cpp_message);
-            cout << getTime() << "Received Request : " << request << endl;
+            cout << "Received Request : " << request << endl;
             json response = generate_response_fx(request, serv);
-            cout << getTime() << "Sending Response : " << response << endl;
+            cout << "Sending Response : " << response << endl;
             serv->server_send(client_fd, response);
         }
     }
@@ -659,7 +658,7 @@ int Server::server_accept(int addrlen, struct sockaddr_in address)
     }
     else
     {
-        cout << getTime() << "Allocating Resources for this consumer (A buffer and A thread) " << new_socket << endl;
+        cout << "Allocating Resources for this consumer (A buffer and A thread) " << new_socket << endl;
         thread th1(handle_client, this, new_socket);
         th1.detach();
         // new_client_buffer, new_client_fd
@@ -701,13 +700,12 @@ void Server::run()
 {
 
     string initial_date;
-    cout << getTime() << "Enter initial date \n";
+    cout << "Enter initial date \n";
     cin >> initial_date;
-    cout << getTime() << "Updating reserves with time \n";
+
     Date curr = Date(initial_date);
     this->cur = &curr;
 
-    update_reserves_with_time();
     while (true)
         this->Server::server_accept(sizeof(address), address);
 }
@@ -720,11 +718,10 @@ int Server::server_disconnect(int client_fd)
 // =========================================================================================== //
 //  Consturctor
 // =========================================================================================== //
-Server::Server(string config_location, string users_location, string rooms_location, string log_file)
+Server::Server(string config_location, string users_location, string rooms_location)
 {
     int server_fd;
-    Logger l;
-    this->logger = &l;
+
     struct sockaddr_in address;
     int opt = 1;
     int addrlen = sizeof(address);
@@ -733,7 +730,7 @@ Server::Server(string config_location, string users_location, string rooms_locat
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-        cout << getTime() << "Opening socket failed" << endl;
+        cout << "Opening socket failed" << endl;
         exit(EXIT_FAILURE);
     }
 
@@ -741,7 +738,7 @@ Server::Server(string config_location, string users_location, string rooms_locat
                    SO_REUSEADDR | SO_REUSEPORT, &opt,
                    sizeof(opt)))
     {
-        cout << getTime() << "Set socket options failed" << endl;
+        cout << "Set socket options failed" << endl;
         exit(EXIT_FAILURE);
     }
     address.sin_family = AF_INET;
@@ -758,12 +755,18 @@ Server::Server(string config_location, string users_location, string rooms_locat
     json users = read_json_f(users_location);
     for (auto &v : users.at("users"))
     {
-        v["logged_in"] = false;
+        if (v.contains("logged_in"))
+        {
+        }
+        else
+        {
+            v["logged_in"] = false;
+        }
     }
     int peers = this->users.count("users");
     if (listen(server_fd, peers) < 0)
     {
-        cout << getTime() << "Listen Failed" << endl;
+        cout << "Listen Failed" << endl;
         exit(EXIT_FAILURE);
     }
     this->users = users;
@@ -773,10 +776,10 @@ Server::Server(string config_location, string users_location, string rooms_locat
     this->rooms_file_location = rooms_location;
     this->users_file_location = users_location;
 
-    cout << getTime() << "Initialized server with current state" << endl;
-    cout << getTime() << "Users :" << this->users.dump(4) << endl;
-    cout << getTime() << "Rooms:" << this->rooms.dump(4) << endl;
-    cout << getTime() << "Config :" << this->users.dump(4) << endl;
+    cout << "Initialized server with current state" << endl;
+    cout << "Users :" << this->users.dump(4) << endl;
+    cout << "Rooms:" << this->rooms.dump(4) << endl;
+    cout << "Config :" << this->users.dump(4) << endl;
 
     this->server_fd = server_fd;
     // read files
@@ -786,8 +789,6 @@ Server::Server(string config_location, string users_location, string rooms_locat
 
 int main(int argc, char const *argv[])
 {
-    // setup server logging
-    string log_file = string(argv[1]);
     string users_location = "jsons/users.json";
     string rooms_location = "jsons/rooms.json";
     string configs_location = "jsons/config.json";
@@ -798,12 +799,12 @@ int main(int argc, char const *argv[])
     //     vector<string> inp = split(initial_input, ' ');
     //     if (inp[0] == "setTime")
     //     {
-    //         cout << getTime() << inp[0];
+    //         cout << inp[0];
     //         initial_date = inp[1];
     //         break;
     //     }
     // }
-    Server new_server = Server(configs_location, users_location, rooms_location, log_file);
+    Server new_server = Server(configs_location, users_location, rooms_location);
 
     new_server.run();
 

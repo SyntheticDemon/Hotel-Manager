@@ -3,7 +3,11 @@
         {
             "admin": "true",
             "id": 0,
+<<<<<<< HEAD
             "logged_in": true,
+=======
+            "logged_in": false,
+>>>>>>> 957d4cce4850e5abf3007fe3b4de8c25a62c29d3
             "password": "admin",
             "user": "Admin"
         },
@@ -31,6 +35,7 @@
             "address": "Iran, Rasht",
             "admin": "false",
             "id": 3,
+<<<<<<< HEAD
             "logged_in": false,
             "password": "6789",
             "phoneNumber": "00989112659874",
@@ -64,6 +69,13 @@
             "phoneNumber": "0901",
             "purse": "5000",
             "user": "people"
+=======
+            "logged_in": true,
+            "password": "6789",
+            "phoneNumber": "00989112659874",
+            "purse": "10",
+            "user": "Pedram"
+>>>>>>> 957d4cce4850e5abf3007fe3b4de8c25a62c29d3
         }
     ]
 }

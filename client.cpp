@@ -165,29 +165,10 @@ json Client::login(vector<string> tokens)
     login_form["username"] = tokens[1];
     login_form["password"] = tokens[2];
     json request = create_request(login_form, "login");
+    cout << "Sending Request" << login_form << endl;
     this->conn->connector_send(request);
     response = this->conn->connector_receive();
-    return response;
-}
-
-json Client::book_room(vector<string> tokens)
-{
-    cout << getTime() << "Enter Your Booking Request" << endl;
-    vector<string> secondery_tokens = receive_and_tokenize_input();
-    json response;
-    string room_number = secondery_tokens[1];
-    string bed_count = secondery_tokens[2];
-    string check_in_date = secondery_tokens[3];
-    string checkout_date = secondery_tokens[4];
-    json booking_form;
-    booking_form["username"] = this->active_username;
-    booking_form["room_number"] = room_number;
-    booking_form["bed_count"] = bed_count;
-    booking_form["check_in_date"] = check_in_date;
-    booking_form["checkout_date"] = checkout_date;
-    json request = create_request(booking_form, "book_room");
-    this->conn->connector_send(request);
-    response = this->conn->connector_receive();
+    cout << "Server Response " << response.dump(4) << endl;
     return response;
 }
 
@@ -197,19 +178,10 @@ json Client::view_user_information(vector<string> tokens)
     json user_formation_form;
     user_formation_form["username"] = this->active_username;
     json request = create_request(user_formation_form, "view_user_information");
+    cout << "Sending Request" << user_formation_form << endl;
     this->conn->connector_send(request);
     response = this->conn->connector_receive();
-    return response;
-}
-
-json Client::view_room_information(vector<string> tokens)
-{
-    json response;
-    json user_formation_form;
-    user_formation_form["username"] = this->active_username;
-    json request = create_request(user_formation_form, "view_room_information");
-    this->conn->connector_send(request);
-    response = this->conn->connector_receive();
+    cout << "Server Response " << response.dump(4) << endl;
     return response;
 }
 
@@ -217,20 +189,14 @@ json Client::pass_day(vector<string> tokens)
 {
     json response;
     json pass_day_form;
-    int days;
-    try
-    {
-        days = atoi(tokens[1].c_str());
-    }
-    catch (exception)
-    {
-        days = 1;
-    }
+    int days = atoi(tokens[1].c_str());
     pass_day_form["days"] = days;
     pass_day_form["username"] = this->active_username;
     json request = create_request(pass_day_form, "pass_day");
+    cout << "Sending Request" << pass_day_form << endl;
     this->conn->connector_send(request);
     response = this->conn->connector_receive();
+    cout << "Server Response " << response.dump(4) << endl;
     return response;
 }
 
@@ -241,28 +207,32 @@ json Client::signup(vector<string> tokens)
     json sign_up_check_form;
     sign_up_check_form["username"] = tokens[1];
     json request = create_request(sign_up_check_form, "signup_check");
+    cout << "Sending Request" << sign_up_check_form << endl;
     this->conn->connector_send(request);
     response = this->conn->connector_receive();
+    cout << "Server Response " << response.dump(4) << endl;
     if (response["code"] == 313)
     {
-        cout << getTime() << "Username check passed Enter the rest of the data " << endl;
+        cout << "Username check passed Enter the rest of the data " << endl;
         string password, purse, phone, address;
-        cout << getTime() << "<< password : ";
+        cout << "<< password : ";
         getline(std::cin, password);
-        cout << getTime() << "<< purse : ";
+        cout << "<< purse : ";
         getline(std::cin, purse);
-        cout << getTime() << "<< phone : ";
+        cout << "<< phone : ";
         getline(std::cin, phone);
-        cout << getTime() << "<< address : ";
+        cout << "<< address : ";
         getline(std::cin, address);
         signup_form["password"] = password;
         signup_form["purse"] = purse;
         signup_form["phone"] = phone;
         signup_form["address"] = address;
         signup_form["username"] = tokens[1];
+        cout << "Sending Request" << signup_form << endl;
         json signup_request = create_request(signup_form, "signup");
         this->conn->connector_send(signup_request);
         response = this->conn->connector_receive();
+        cout << "Server Response " << response.dump(4) << endl;
     }
     else
     {
@@ -274,7 +244,7 @@ json Client::signup(vector<string> tokens)
 vector<string> Client::receive_and_tokenize_input()
 {
     string input_string;
-    cout << getTime() << "<< ";
+    cout << "<< ";
     getline(std::cin, input_string);
     vector<string> tokens = tokenize(input_string, ' ');
     // inputs.push_back(tokenize(input_string));
@@ -293,85 +263,49 @@ void Client::run()
 
     while (true)
     {
-        if (this->active_username != "nil")
-        {
-            showMenu();
-        }
-        else
-        {
-            cout << getTime() << "Please Login or Signup if you don't have an account" << endl;
-            sleep(0.25);
-        }
         json response;
-        try
+        vector<string> tokens = receive_and_tokenize_input();
+        string command = tokens[0];
+        if (command == "login")
         {
-            vector<string> tokens = receive_and_tokenize_input();
-            string command = tokens[0];
-            if (command == "login")
+            response = this->login(tokens);
+            if (response.at("code") == 230)
             {
-                response = this->login(tokens);
-                if (response.at("code") == 230)
-                {
-                    cout << getTime() << "You are now logged in" << endl;
-                    this->active_username = response.at("username");
-                }
-                else if (response.at("code") == 430)
-                {
-                    this->active_username = response.at("username");
-                }
+                cout << "You are now logged in" << endl;
+                this->active_username = response.at("username");
+                showMenu();
             }
-            else if (command == "signup")
-            {
+        }
+        else if (command == "signup")
+        {
 
-                response = this->signup(tokens);
-            }
-            else if (command == "0")
+            response = this->signup(tokens);
+        }
+        else if (command == "logout")
+        {
+            response = this->logout(this->active_username);
+            if (response["code"] == 230)
             {
-                response = this->logout(this->active_username);
-                if (response["code"] == 230)
-                {
-                    this->active_username = "nil";
-                }
+                this->active_username = "nil";
             }
-            else if (command == "6")
-            {
-                response = this->pass_day(tokens);
-            }
-            else if (command == "2")
-            {
+        }
+        else if (command == "pass_day")
+        {
+            response = this->pass_day(tokens);
+        }
+        else if (command == "all_users")
+        {
 
-                response = this->all_users(tokens);
-            }
-            else if (command == "1")
-            {
-                response = this->view_user_information(tokens);
-            }
-            else if (command == "3")
-            {
-                response = this->view_room_information(tokens);
-            }
-            else if (command == "4")
-            {
-                response = this->book_room(tokens);
-            }
-            else
-            {
-                throw(503);
-            }
-            // cout << getTime() << "Server Response " << response << endl;
+            response = this->all_users(tokens);
         }
-        catch (int error_code)
+        else if (command == "view_user_information")
         {
-            response["code"] = 503;
-            response["message"] = "User command parsing failed (local error)";
-            cout << getTime() << "Local Response" << response.dump(4) << endl;
+            response = this->view_user_information(tokens);
         }
-        catch (exception)
-        {
-            response["code"] = 503;
-            response["message"] = "User command parsing failed (local error)";
-            cout << getTime() << "Local Response" << response.dump(4) << endl;
-        }
+
+        // cout << "Server Response " << response << endl;
+
+        cout << endl;
     }
 }
 int main(int argc, char const *argv[])
