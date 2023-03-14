@@ -114,6 +114,8 @@ public:
     json logout(string username);
     json signup(vector<string> tokens);
     json login(vector<string> tokens);
+    json all_users(vector<string> tokens);
+    json view_user_information(vector<string> tokens);
     json pass_day(vector<string> tokens);
 };
 
@@ -135,7 +137,20 @@ json Client::logout(string username)
     cout << "Sending Request" << logout_form << endl;
     this->conn->connector_send(request);
     response = this->conn->connector_receive();
-    cout << "Server Response " << response << endl;
+    cout << "Server Response " << response.dump(4) << endl;
+    return response;
+}
+
+json Client::all_users(vector<string> tokens)
+{
+    json response;
+    json all_users_form;
+    all_users_form["username"] = this->active_username;
+    json request = create_request(all_users_form, "all_users");
+    cout << "Sending Request" << all_users_form << endl;
+    this->conn->connector_send(request);
+    response = this->conn->connector_receive();
+    cout << "Server Response " << response.dump(4) << endl;
     return response;
 }
 
@@ -149,7 +164,20 @@ json Client::login(vector<string> tokens)
     cout << "Sending Request" << login_form << endl;
     this->conn->connector_send(request);
     response = this->conn->connector_receive();
-    cout << "Server Response " << response << endl;
+    cout << "Server Response " << response.dump(4) << endl;
+    return response;
+}
+
+json Client::view_user_information(vector<string> tokens)
+{
+    json response;
+    json user_formation_form;
+    user_formation_form["username"] = this->active_username;
+    json request = create_request(user_formation_form, "view_user_information");
+    cout << "Sending Request" << user_formation_form << endl;
+    this->conn->connector_send(request);
+    response = this->conn->connector_receive();
+    cout << "Server Response " << response.dump(4) << endl;
     return response;
 }
 
@@ -164,7 +192,7 @@ json Client::pass_day(vector<string> tokens)
     cout << "Sending Request" << pass_day_form << endl;
     this->conn->connector_send(request);
     response = this->conn->connector_receive();
-    cout << "Server Response " << response << endl;
+    cout << "Server Response " << response.dump(4) << endl;
     return response;
 }
 
@@ -178,7 +206,7 @@ json Client::signup(vector<string> tokens)
     cout << "Sending Request" << sign_up_check_form << endl;
     this->conn->connector_send(request);
     response = this->conn->connector_receive();
-    cout << "Server Response " << response << endl;
+    cout << "Server Response " << response.dump(4) << endl;
     if (response["code"] == 313)
     {
         cout << "Username check passed Enter the rest of the data " << endl;
@@ -200,7 +228,7 @@ json Client::signup(vector<string> tokens)
         json signup_request = create_request(signup_form, "signup");
         this->conn->connector_send(signup_request);
         response = this->conn->connector_receive();
-        cout << "Server Response " << response;
+        cout << "Server Response " << response.dump(4) << endl;
     }
     else
     {
@@ -261,6 +289,16 @@ void Client::run()
         {
             response = this->pass_day(tokens);
         }
+        else if (command == "all_users")
+        {
+
+            response = this->all_users(tokens);
+        }
+        else if (command == "view_user_information")
+        {
+            response = this->view_user_information(tokens);
+        }
+
         // cout << "Server Response " << response << endl;
 
         cout << endl;

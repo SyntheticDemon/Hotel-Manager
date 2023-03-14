@@ -104,6 +104,9 @@ public:
         pthread_mutex_lock(&this->data_lock);
         this->rooms = new_rooms;
         pthread_mutex_unlock(&this->data_lock);
+        ofstream rooms_f(this->rooms_file_location);
+        rooms_f << this->rooms.dump(4);
+        // persist data in the disk after each update
     }
     void set_configs(json new_config)
     {
@@ -116,9 +119,15 @@ public:
         pthread_mutex_lock(&this->data_lock);
         this->users = new_users;
         pthread_mutex_unlock(&this->data_lock);
+        ofstream users_f(this->users_file_location);
+        users_f << this->users.dump(4);
+        // persist data in the disk after each update
     }
 
 private:
+    string users_file_location;
+    string config_file_location;
+    string rooms_file_location;
     json users;
     json config;
     json rooms;
@@ -219,6 +228,7 @@ json logout_repsonse(json request, Server *serv)
     }
     return response;
 }
+
 json login_response(json request, Server *serv)
 {
     json response;
@@ -245,6 +255,78 @@ json login_response(json request, Server *serv)
     {
         response["code"] = 430;
         response["message"] = "Log in failed";
+    }
+    return response;
+}
+
+json view_user_information_response(json request, Server *serv)
+{
+    json response;
+    string request_username = request.at("payload").at("username");
+    json target_user = search_json(request_username, "user", "users", serv->get_users());
+    if (target_user != nullptr)
+    {
+        if (target_user["logged_in"] == true)
+        {
+            response["code"] = 230;
+            response["user"] = target_user;
+            response["message"] = "User information Retrived succesfully";
+        }
+        else
+        {
+            response["code"] = 430;
+            response["message"] = "You are not logged in ";
+        }
+    }
+    else
+    {
+        response["code"] = 404;
+        response["message"] = "Not logged in or user not found";
+    }
+    return response;
+}
+
+void remove_password_from_users(json &users)
+{
+    for (auto &v : users.at("users"))
+    {
+        v.erase("password");
+    }
+}
+
+json all_users_response(json request, Server *serv)
+{
+    json response;
+    string request_username = request.at("payload").at("username");
+    json target_user = search_json(request_username, "user", "users", serv->get_users());
+    json user_backup = serv->get_users();
+    remove_password_from_users(user_backup);
+    if (target_user != nullptr)
+    {
+        if (target_user["logged_in"] == true)
+        {
+            if (target_user["admin"] == "true")
+            {
+                response["code"] = 230;
+                response["users"] = user_backup;
+                response["message"] = "User information Retrived succesfully";
+            }
+            else
+            {
+                response["code"] = 430;
+                response["message"] = "You are not an admin and cannot view all users ";
+            }
+        }
+        else
+        {
+            response["code"] = 430;
+            response["message"] = "You are not logged in ";
+        }
+    }
+    else
+    {
+        response["code"] = 404;
+        response["message"] = "Not logged in or user not found";
     }
     return response;
 }
@@ -314,6 +396,14 @@ json generate_response_fx(json request, Server *serv)
     else if (request_type == "pass_day")
     {
         response = pass_day_response(request, serv);
+    }
+    else if (request_type == "view_user_information")
+    {
+        response = view_user_information_response(request, serv);
+    }
+    else if (request_type == "all_users")
+    {
+        response = all_users_response(request, serv);
     }
     return response;
 }
@@ -408,6 +498,7 @@ void Server::run()
 
 int Server::server_disconnect(int client_fd)
 {
+
     return close(client_fd);
 }
 // =========================================================================================== //
@@ -467,11 +558,14 @@ Server::Server(string config_location, string users_location, string rooms_locat
     this->users = users;
     this->port = port;
     this->address = address;
+    this->config_file_location = config_location;
+    this->rooms_file_location = rooms_location;
+    this->users_file_location = users_location;
 
     cout << "Initialized server with current state" << endl;
-    cout << "Users :" << this->users.dump() << endl;
-    cout << "Rooms:" << this->rooms.dump() << endl;
-    cout << "Config :" << this->users.dump() << endl;
+    cout << "Users :" << this->users.dump(4) << endl;
+    cout << "Rooms:" << this->rooms.dump(4) << endl;
+    cout << "Config :" << this->users.dump(4) << endl;
 
     this->server_fd = server_fd;
     // read files
