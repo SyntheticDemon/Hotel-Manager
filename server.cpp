@@ -52,6 +52,19 @@ json search_json(string id, string id_field, string sub_path, json input)
     return nullptr;
 }
 
+int search_json_array(string id, string id_field, string sub_path, json input)
+{
+    int x = 0;
+    for (auto v : input.at(sub_path))
+    {
+        if (v.at(id_field) == id)
+        {
+            return x;
+        }
+        x += 1;
+    }
+    return -1;
+}
 json search_json_reference(string id, string id_field, string sub_path, json input)
 {
     for (auto &v : input.at(sub_path))
@@ -244,6 +257,7 @@ bool Server::invalid_date(string start, string end)
 // =========================================================================================== //
 // Responses
 // =========================================================================================== //
+
 json pass_day_response(json request, Server *serv)
 {
     json response;
@@ -435,6 +449,30 @@ json view_room_information_response(json request, Server *serv)
     }
     return response;
 }
+json edit_information_response(json request, Server *serv)
+{
+    json response;
+    json payload = request.at("payload");
+    json target_user = search_json(payload.at("username"), "user", "users", serv->get_users());
+    if (target_user.at("logged_in") == true)
+    {
+        response["code"] = 312;
+        response["username"] = request.at("payload").at("username");
+        response["message"] = "Information edited succesfully";
+        target_user["password"] = payload.at("new_password");
+        target_user["phone"] = payload.at("phone");
+        target_user["address"] = payload.at("address");
+        json updated_json = update_json(request.at("payload").at("username"), "user", "users", serv->get_users(), target_user);
+        serv->set_users(updated_json);
+    }
+    else
+    {
+        response["code"] = 503;
+        response["message"] = "You are not logged in  ";
+        response["username"] = request.at("payload").at("username");
+    }
+    return response;
+}
 
 json book_room_response(json request, Server *serv)
 {
@@ -573,6 +611,177 @@ json signup_response(json request, Server *serv)
     response["code"] = 231;
     return response;
 }
+
+json modify_room_response(json request, Server *serv)
+{
+
+    json response;
+    json payload = request.at("payload");
+    string room_id = payload.at("id");
+    string price = payload.at("price");
+    string max_capacity = payload.at("max_capacity");
+    string request_username = payload.at("username");
+    json target_user = search_json_reference(request_username, "user", "users", serv->get_users());
+    string target_room_id = payload.at("room_number");
+    json target_room = search_json_reference(target_room_id, "number", "rooms", serv->get_rooms());
+    if (target_room == nullptr)
+    {
+        response["message"] = "Room was not found";
+        response["code"] = 101;
+        return response;
+    }
+    if (target_user != nullptr)
+    {
+        if (target_user.at("logged_in") == true)
+        {
+            if (target_user.at("admin") == "false")
+            {
+                response["code"] = 403;
+                response["message"] = "You not an Admin and don't have access to rooms";
+            }
+            else
+            {
+                json rooms_backup = serv->get_rooms();
+                json new_room;
+                int max_capacity_int = atoi(max_capacity.c_str());
+                new_room["capacity"] = 0;
+                new_room["max_capacity"] = max_capacity;
+                new_room["status"] = 0;
+                new_room["users"] = json::array();
+                new_room["number"] = room_id;
+                rooms_backup = update_json(target_room_id, "number", "rooms", rooms_backup, new_room);
+                serv->set_rooms(rooms_backup);
+                response["code"] = 104;
+                response["message"] = "Room modified succesfully";
+            }
+        }
+        else
+        {
+            response["code"] = 430;
+            response["message"] = "You are not logged in ";
+        }
+    }
+    else
+    {
+        response["code"] = 404;
+        response["message"] = "Not logged in or user not found";
+    }
+    return response;
+}
+
+json remove_room_response(json request, Server *serv)
+{
+    json response;
+    json payload = request.at("payload");
+    string room_id = payload.at("id");
+    string request_username = payload.at("username");
+    json target_user = search_json_reference(request_username, "user", "users", serv->get_users());
+    string target_room_id = payload.at("room_number");
+    json target_room = search_json_reference(target_room_id, "number", "rooms", serv->get_rooms());
+    if (target_room != nullptr)
+    {
+        response["message"] = "Room id is occupied";
+        response["code"] = 111;
+        return response;
+    }
+    if (target_user != nullptr)
+    {
+        if (target_user.at("logged_in") == true)
+        {
+            if (target_user.at("admin") == "false")
+            {
+                response["code"] = 403;
+                response["message"] = "You not an Admin and don't have access to rooms";
+            }
+            else
+            {
+                if (target_room.at("status"))
+                {
+
+                    json rooms_backup = serv->get_rooms();
+                    int room_index = search_json_array(target_room_id, "number", "rooms", rooms_backup);
+                    rooms_backup.at("rooms").erase(room_index);
+                    serv->set_rooms(rooms_backup);
+                    response["code"] = 104;
+                    response["message"] = "New room created";
+                }
+                else
+                {
+                    response["code"] = 109;
+                    response["message"] = "Room is full and uneditble";
+                }
+            }
+        }
+        else
+        {
+            response["code"] = 430;
+            response["message"] = "You are not logged in ";
+        }
+    }
+    else
+    {
+        response["code"] = 404;
+        response["message"] = "Not logged in or user not found";
+    }
+    return response;
+}
+
+json add_room_response(json request, Server *serv)
+{
+
+    json response;
+    json payload = request.at("payload");
+    string room_id = payload.at("id");
+    string price = payload.at("price");
+    string max_capacity = payload.at("max_capacity");
+    string request_username = payload.at("username");
+    json target_user = search_json_reference(request_username, "user", "users", serv->get_users());
+    string target_room_id = payload.at("room_number");
+    json target_room = search_json_reference(target_room_id, "number", "rooms", serv->get_rooms());
+    if (target_room != nullptr)
+    {
+        response["message"] = "Room id is occupied";
+        response["code"] = 111;
+        return response;
+    }
+    if (target_user != nullptr)
+    {
+        if (target_user.at("logged_in") == true)
+        {
+            if (target_user.at("admin") == "false")
+            {
+                response["code"] = 403;
+                response["message"] = "You not an Admin and don't have access to rooms";
+            }
+            else
+            {
+                json rooms_backup = serv->get_rooms();
+                json new_room;
+                int max_capacity_int = atoi(max_capacity.c_str());
+                new_room["capacity"] = 0;
+                new_room["max_capacity"] = max_capacity;
+                new_room["status"] = 0;
+                new_room["users"] = json::array();
+                new_room["number"] = room_id;
+                rooms_backup.at("rooms").push_back(new_room);
+                serv->set_rooms(rooms_backup);
+                response["code"] = 104;
+                response["message"] = "New room created";
+            }
+        }
+        else
+        {
+            response["code"] = 430;
+            response["message"] = "You are not logged in ";
+        }
+    }
+    else
+    {
+        response["code"] = 404;
+        response["message"] = "Not logged in or user not found";
+    }
+    return response;
+}
 json generate_response_fx(json request, Server *serv)
 {
     string request_type = request.at("type");
@@ -619,11 +828,28 @@ json generate_response_fx(json request, Server *serv)
 
         response = book_room_response(request, serv);
     }
+    else if (request_type == "edit_information")
+    {
+
+        response = edit_information_response(request, serv);
+    }
+    else if (request_type == "remove_room")
+    {
+        response = remove_room_response(request, serv);
+    }
+    else if (request_type == "modify")
+    {
+        response = modify_room_response(request, serv);
+    }
+    else if (request_type == "add")
+    {
+        response = add_room_response(request, serv);
+    }
     return response;
 }
 void handle_client(Server *serv, int client_fd)
 {
-    cout << "Started Client Thread " << client_fd << endl;
+    cout << getTime() << "Started Client Thread " << client_fd << endl;
 
     while (true)
     {
@@ -631,17 +857,18 @@ void handle_client(Server *serv, int client_fd)
         if (read(client_fd, new_client_buffer, BUFFER_SIZE) == 0)
         {
 
-            cout << "Client FD did not return valid request" << endl;
+            cout << getTime() << "Client FD did not return valid request" << endl;
             serv->server_disconnect(client_fd);
             break;
         }
         else
         {
+
             std::string cpp_message(new_client_buffer);
             json request = serv->deserialize(cpp_message);
-            cout << "Received Request : " << request << endl;
+            cout << getTime() << "Received Request : " << request << endl;
             json response = generate_response_fx(request, serv);
-            cout << "Sending Response : " << response << endl;
+            cout << getTime() << "Sending Response : " << response << endl;
             serv->server_send(client_fd, response);
         }
     }
@@ -658,7 +885,7 @@ int Server::server_accept(int addrlen, struct sockaddr_in address)
     }
     else
     {
-        cout << "Allocating Resources for this consumer (A buffer and A thread) " << new_socket << endl;
+        cout << getTime() << "Allocating Resources for this consumer (A buffer and A thread) " << new_socket << endl;
         thread th1(handle_client, this, new_socket);
         th1.detach();
         // new_client_buffer, new_client_fd
@@ -700,12 +927,13 @@ void Server::run()
 {
 
     string initial_date;
-    cout << "Enter initial date \n";
+    cout << getTime() << "Enter initial date \n";
     cin >> initial_date;
-
+    cout << getTime() << "Updating reserves with time \n";
     Date curr = Date(initial_date);
     this->cur = &curr;
 
+    update_reserves_with_time();
     while (true)
         this->Server::server_accept(sizeof(address), address);
 }
@@ -718,10 +946,11 @@ int Server::server_disconnect(int client_fd)
 // =========================================================================================== //
 //  Consturctor
 // =========================================================================================== //
-Server::Server(string config_location, string users_location, string rooms_location)
+Server::Server(string config_location, string users_location, string rooms_location, string log_file)
 {
     int server_fd;
-
+    Logger l;
+    this->logger = &l;
     struct sockaddr_in address;
     int opt = 1;
     int addrlen = sizeof(address);
@@ -730,7 +959,7 @@ Server::Server(string config_location, string users_location, string rooms_locat
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-        cout << "Opening socket failed" << endl;
+        cout << getTime() << "Opening socket failed" << endl;
         exit(EXIT_FAILURE);
     }
 
@@ -738,7 +967,7 @@ Server::Server(string config_location, string users_location, string rooms_locat
                    SO_REUSEADDR | SO_REUSEPORT, &opt,
                    sizeof(opt)))
     {
-        cout << "Set socket options failed" << endl;
+        cout << getTime() << "Set socket options failed" << endl;
         exit(EXIT_FAILURE);
     }
     address.sin_family = AF_INET;
@@ -755,18 +984,12 @@ Server::Server(string config_location, string users_location, string rooms_locat
     json users = read_json_f(users_location);
     for (auto &v : users.at("users"))
     {
-        if (v.contains("logged_in"))
-        {
-        }
-        else
-        {
-            v["logged_in"] = false;
-        }
+        v["logged_in"] = false;
     }
     int peers = this->users.count("users");
     if (listen(server_fd, peers) < 0)
     {
-        cout << "Listen Failed" << endl;
+        cout << getTime() << "Listen Failed" << endl;
         exit(EXIT_FAILURE);
     }
     this->users = users;
@@ -776,10 +999,10 @@ Server::Server(string config_location, string users_location, string rooms_locat
     this->rooms_file_location = rooms_location;
     this->users_file_location = users_location;
 
-    cout << "Initialized server with current state" << endl;
-    cout << "Users :" << this->users.dump(4) << endl;
-    cout << "Rooms:" << this->rooms.dump(4) << endl;
-    cout << "Config :" << this->users.dump(4) << endl;
+    cout << getTime() << "Initialized server with current state" << endl;
+    cout << getTime() << "Users :" << this->users.dump(4) << endl;
+    cout << getTime() << "Rooms:" << this->rooms.dump(4) << endl;
+    cout << getTime() << "Config :" << this->users.dump(4) << endl;
 
     this->server_fd = server_fd;
     // read files
@@ -789,6 +1012,8 @@ Server::Server(string config_location, string users_location, string rooms_locat
 
 int main(int argc, char const *argv[])
 {
+    // setup server logging
+    string log_file = string(argv[1]);
     string users_location = "jsons/users.json";
     string rooms_location = "jsons/rooms.json";
     string configs_location = "jsons/config.json";
@@ -799,12 +1024,12 @@ int main(int argc, char const *argv[])
     //     vector<string> inp = split(initial_input, ' ');
     //     if (inp[0] == "setTime")
     //     {
-    //         cout << inp[0];
+    //         cout << getTime() << inp[0];
     //         initial_date = inp[1];
     //         break;
     //     }
     // }
-    Server new_server = Server(configs_location, users_location, rooms_location);
+    Server new_server = Server(configs_location, users_location, rooms_location, log_file);
 
     new_server.run();
 
