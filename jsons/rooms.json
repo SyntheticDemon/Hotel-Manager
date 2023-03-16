@@ -1,12 +1,34 @@
 {
     "rooms": [
         {
-            "capacity": 100,
+            "capacity": 99,
             "max_capacity": 100,
             "number": "100",
             "price": 100,
             "status": 0,
-            "users": []
+            "users": [
+                {
+                    "bed_count": 1,
+                    "check_in_date": "2022-11-11",
+                    "checkout_date": "2022-11-13",
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "capacity": 100,
+            "max_capacity": 100,
+            "number": "39",
+            "price": 10,
+            "status": 0,
+            "users": [
+                {
+                    "bed_count": 1,
+                    "check_in_date": "2044-11-11",
+                    "checkout_date": "2045-11-11",
+                    "id": 2
+                }
+            ]
         }
     ]
 }

@@ -14,7 +14,7 @@
 #include <arpa/inet.h>
 #include <fstream>
 #include "server.h"
-#include <semaphore>
+// #include <semaphore>
 #include "responses.h"
 #include <thread>
 #include <stdlib.h>

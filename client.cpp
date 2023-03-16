@@ -3,8 +3,8 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <string.h>
-#include <boost/iostreams/stream.hpp>
-#include <boost/iostreams/tee.hpp>
+// #include <boost/iostreams/stream.hpp>
+// #include <boost/iostreams/tee.hpp>
 #include <filesystem>
 #include <bits/stdc++.h>
 #include <sys/socket.h>
@@ -410,7 +410,7 @@ json Client::signup(vector<string> tokens)
     json request = create_request(sign_up_check_form, "signup_check");
     this->conn->connector_send(request);
     response = this->conn->connector_receive();
-    if (response["code"] == 313)
+    if (response["code"] == 311)
     {
         cout << getTime() << "Username check passed Enter the rest of the data " << endl;
         string password, purse, phone, address;
@@ -501,7 +501,7 @@ void Client::run()
             else if (command == "0")
             {
                 response = this->logout(this->active_username);
-                if (response["code"] == 230)
+                if (response["code"] == 201)
                 {
                     this->active_username = "nil";
                 }

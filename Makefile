@@ -1,9 +1,9 @@
 all: Client Server
 Server: server.o date.o responses.o my_utils.o json_utils.o my_utils.o logger.o 
-	g++ server.o date.o responses.o  json_utils.o my_utils.o logger.o -lstdc++ -o Server.exe
+	g++ -pthread server.o date.o responses.o  json_utils.o my_utils.o logger.o -lstdc++ -o Server.exe
 
 Client: client.o my_utils.o json_utils.o logger.o
-	g++ client.o my_utils.o json_utils.o logger.o  -lstdc++ -o Client.exe
+	g++ -pthread client.o my_utils.o json_utils.o logger.o  -lstdc++ -o Client.exe
 
 client.o: client.cpp logger.h json_utils.h my_utils.h 
 	g++ -c client.cpp -o client.o -lstdc++

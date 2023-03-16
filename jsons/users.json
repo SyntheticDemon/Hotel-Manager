@@ -16,7 +16,7 @@
             "logged_in": false,
             "password": "1234",
             "phoneNumber": "00945692356",
-            "purse": "1000",
+            "purse": "890",
             "user": "Morad"
         },
         {
@@ -39,6 +39,16 @@
             "phoneNumber": "00125692356",
             "purse": "999980000",
             "user": "Pedram"
+        },
+        {
+            "address": "kordestan",
+            "admin": false,
+            "id": 5,
+            "logged_in": false,
+            "password": "rostam",
+            "phoneNumber": "09111111111",
+            "purse": "2000000",
+            "user": "Rostam"
         }
     ]
 }
