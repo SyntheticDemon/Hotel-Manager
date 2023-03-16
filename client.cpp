@@ -29,6 +29,7 @@ void showMenu()
     cout << getTime() << "<< 8. Leaving room" << endl;
     cout << getTime() << "<< 9. Rooms" << endl;
     cout << getTime() << "<< 0. Logout" << endl;
+    cout << getTime() << "<< 11.View Empty room information" << endl;
     return;
 }
 class Connector
@@ -136,6 +137,7 @@ public:
     json edit_information(vector<string> tokens);
     json pass_day(vector<string> tokens);
     json view_room_information(vector<string> tokens);
+    json view_empty_room_information(vector<string> tokens);
     json rooms_response(vector<string> tokens);
     json leave_room(vector<string> tokens);
     json cancel_room(vector<string> tokens);
@@ -371,6 +373,17 @@ json Client::view_room_information(vector<string> tokens)
     return response;
 }
 
+json Client::view_empty_room_information(vector<string> tokens)
+{
+    json response;
+    json user_formation_form;
+    user_formation_form["username"] = this->active_username;
+    json request = create_request(user_formation_form, "view_empty_room_information");
+    this->conn->connector_send(request);
+    response = this->conn->connector_receive();
+    return response;
+}
+
 json Client::pass_day(vector<string> tokens)
 {
     json response;
@@ -509,6 +522,10 @@ void Client::run()
             else if (command == "3")
             {
                 response = this->view_room_information(tokens);
+            }
+            else if (command == "11")
+            {
+                response = this->view_empty_room_information(tokens);
             }
             else if (command == "4")
             {

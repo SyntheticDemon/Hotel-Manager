@@ -199,7 +199,7 @@ json view_room_information_response(json request, Server *serv)
         if (target_user["logged_in"] == true)
         {
             response["code"] = 230;
-            response["rooms"] = rooms_backup;
+            response["rooms"] = rooms_backup.at("rooms");
             response["message"] = "Room Information Retrived succesfully";
         }
         else
@@ -214,6 +214,45 @@ json view_room_information_response(json request, Server *serv)
         response["message"] = "Not logged in or user not found";
     }
     return response;
+}
+
+json view_empty_rooms_response(json request, Server *serv)
+{
+    json response;
+    string request_username = request.at("payload").at("username");
+    json target_user = search_json(request_username, "user", "users", serv->get_users());
+    json rooms_backup = serv->get_rooms();
+    json filtered_rooms_backup = json::array();
+    if (target_user != nullptr)
+    {
+        if (target_user["logged_in"] == false)
+        {
+            response["code"] = 430;
+            response["message"] = "You are not logged in ";
+            return response;
+        }
+        else
+        {
+            for (auto v : rooms_backup.at("rooms"))
+            {
+                int capacity = serv->get_room_capacity(v);
+                if (capacity == v.at("max_capacity"))
+                {
+                    filtered_rooms_backup.push_back(v);
+                }
+            }
+            response["rooms"] = filtered_rooms_backup;
+            response["code"] = 230;
+            response["message"] = "Empty rooms retrieved succesfully";
+            return response;
+        }
+    }
+    else
+    {
+        response["code"] = 404;
+        response["message"] = "Not logged in or user not found";
+        return response;
+    }
 }
 json edit_information_response(json request, Server *serv)
 {
@@ -801,10 +840,15 @@ json generate_response_fx(json request, Server *serv)
         {
             response = all_users_response(request, serv);
         }
+        else if (request_type == "view_empty_room_information")
+        {
+            response = view_empty_rooms_response(request, serv);
+        }
         else if (request_type == "view_room_information")
         {
             response = view_room_information_response(request, serv);
         }
+
         else if (request_type == "book_room")
         {
 
