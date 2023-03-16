@@ -26,7 +26,7 @@ Command directives are in the PDF of the proejct file
 یک Wrapper دور Socket زده شده است که Connection با سرور را Manage می کند
 
 کلاس Connector  در کلاینت.
-
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image1.png)
 ------>  image1.png
 
 
