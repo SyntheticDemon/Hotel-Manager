@@ -369,15 +369,11 @@ json Client::pass_day(vector<string> tokens)
 {
     json response;
     json pass_day_form;
+    string days_input;
+    cout << getTime() << "Type the number of days to fast forward " << endl;
+    getline(std::cin, days_input);
     int days;
-    if (tokens.size() < 2)
-    {
-        tokens[1] = 1;
-    }
-    else
-    {
-        days = atoi(tokens[1].c_str());
-    }
+    days = atoi(days_input.c_str());
     pass_day_form["days"] = days;
     pass_day_form["username"] = this->active_username;
     json request = create_request(pass_day_form, "pass_day");

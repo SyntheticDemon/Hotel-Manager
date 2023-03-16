@@ -84,9 +84,9 @@ public:
     }
     void set_rooms(json new_rooms)
     {
-        pthread_mutex_lock(&this->room_data_lock);
+        // pthread_mutex_lock(&this->room_data_lock);
         this->rooms = new_rooms;
-        pthread_mutex_unlock(&this->room_data_lock);
+        // pthread_mutex_unlock(&this->room_data_lock);
         ofstream rooms_f(this->rooms_file_location);
         rooms_f << this->rooms.dump(4);
         // persist data in the disk after each update
@@ -97,9 +97,9 @@ public:
     }
     void set_users(json new_users)
     {
-        pthread_mutex_lock(&this->user_data_lock);
+        // pthread_mutex_lock(&this->user_data_lock);
         this->users = new_users;
-        pthread_mutex_unlock(&this->user_data_lock);
+        // pthread_mutex_unlock(&this->user_data_lock);
         ofstream users_f(this->users_file_location);
         users_f << this->users.dump(4);
         // persist data in the disk after each update

@@ -33,7 +33,7 @@
             "address": "Jamalzade",
             "admin": "false",
             "id": 3,
-            "logged_in": true,
+            "logged_in": false,
             "password": "1",
             "phone": "09016763161",
             "phoneNumber": "00125692356",
