@@ -34,7 +34,7 @@ Utility methods contain serialization and dumping ,
 Printing the server response happens on each server receipt.
 
 
------->  image2.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image2.png)
 
 
 
@@ -44,13 +44,15 @@ The server handles multiple clients using cpp threads, when the server accepts a
 Handle-client function is used for this affair
 
 
------->  image3.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image3.png)
+
 
 Call back functions 
 
 
 
------->  image4.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image4.png)
+
 
 
 Server.h 
@@ -58,7 +60,8 @@ Gives basic communication utility with the client , deserializes and serializes 
 
 
 
------->  image5.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image5.png)
+
 
 
 
@@ -68,7 +71,8 @@ Mutex locks are used for maintaining thread safety with the json files that are 
 JSON storage is updated after each insertion, functions that need to be thread safe because of race conditions handle races by acquring mutex locks 
 
 
------->  image6.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image6.png)
+
 
 
 
@@ -76,20 +80,17 @@ JSON storage is updated after each insertion, functions that need to be thread s
 JSON utilities enabled with nlohmann library and  hand written Date utility for working with dates
 
 
------->  image7.png
-
------->  image8.png
-
------->  image9.png
-
------->  image10.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image7.png)
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image8.png)
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image9.png)
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image10.png)
 
 
 
 Hotel managment logic :
 
 
------->  image11.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image11.png)
 
 
 1- Overlap occupations finds out the capacity of each room for a potential reservation
@@ -108,11 +109,14 @@ Hotel managment logic :
 A sample of a call back function that creates response ( each executing thread for the client calls this function )
 
 
------->  image12.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image12.png)
 
------->  image13.png
 
------->  image14.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image13.png)
+
+
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image14.png)
+
 
 
 
@@ -121,192 +125,214 @@ Outputs :
 
 Run server :
 
------->  image15.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image15.png)
+
 
 
 
 Run client : 
 
------->  image16.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image16.png)
 
 
 
 successful login :
 
------->  image17.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image17.png)
+
 
 
 
 
 Login failed :
 
------->  image18.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image18.png)
+
 
 
 
 
 Logout : 
 
------->  image19.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image19.png)
+
 
 
 
 
 View‬‬ ‫‪user‬‬ ‫‪information :
 
------->  image20.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image20.png)
+
 
 
 
 ‫‪‬‬ 
 View‬‬ ‫‪all‬‬ ‫‪users :
 
------->  image21.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image21.png)
+
 
 
 
 
 View‬‬ ‫‪Rooms‬‬ ‫‪Information :
 
------->  image22.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image22.png)
+
 
 
 
 
 Leaving‬‬ ‫‪room :
 
------->  image23.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image23.png)
+
 
 
 
 
 Successful signup : 
 
------->  image24.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image24.png)
+
 
 
 
 
 Error 403 : 
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image25.png)
 
------->  image25.png
 
 
 
 
 Error 503: 
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image26.png)
 
------->  image26.png
 
 
 
 
 Successful ‫‪Booking‬‬ :
 
------->  image27.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image27.png)
+
 
 
 
 
 Add Room : 
 
------->  image28.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image28.png)
+
 
 
 
 
 Modify Room : 
 
------->  image29.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image29.png)
+
 
 
 
 
 Remove Room : 
 
------->  image30.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image30.png)
+
 
 
 
 
 Edit‬‬ ‫‪information :
 
------->  image31.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image31.png)
+
 
 
 
 
 Canceling :
 
------->  image32.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image32.png)
+
 
 
 
 
 Error 451 : 
 
------->  image33.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image33.png)
+
 
 
 
 
 Error 101 : 
 
------->  image34.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image34.png)
 
 
 
 
 Error 108 : 
 
------->  image35.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image35.png)
 
 
 
 
 Error 111 : 
 
------->  image36.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image36.png)
+
 
 
 
 
 Error 102 : 
 
------->  image37.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image37.png)
+
 
 
 
 
 Error 231 : 
 
------->  image38.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image38.png)
+
 
 
 
 
 Error 109 : 
 
------->  image39.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image39.png)
+
 
 
 
 
 Error 311 : 
 
------->  image40.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image40.png)
+
 
 
 
 
 View Empty room information : 
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image41.png)
 
------->  image41.png
 
 
 Error 102 (leaving room): 
 
------->  image42.png
+![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image42.png)
+
 
 
 
