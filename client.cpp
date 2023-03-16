@@ -302,21 +302,27 @@ json Client::book_room(vector<string> tokens)
 {
     cout << getTime() << "Enter Your Booking Request" << endl;
     vector<string> secondery_tokens = receive_and_tokenize_input();
-    json response;
-    string room_number = secondery_tokens[1];
-    string bed_count = secondery_tokens[2];
-    string check_in_date = secondery_tokens[3];
-    string checkout_date = secondery_tokens[4];
-    json booking_form;
-    booking_form["username"] = this->active_username;
-    booking_form["room_number"] = room_number;
-    booking_form["bed_count"] = bed_count;
-    booking_form["check_in_date"] = check_in_date;
-    booking_form["checkout_date"] = checkout_date;
-    json request = create_request(booking_form, "book_room");
-    this->conn->connector_send(request);
-    response = this->conn->connector_receive();
-    return response;
+    if (secondery_tokens.size() != 5)
+    {
+        throw(503);
+    }
+    {
+        json response;
+        string room_number = secondery_tokens[1];
+        string bed_count = secondery_tokens[2];
+        string check_in_date = secondery_tokens[3];
+        string checkout_date = secondery_tokens[4];
+        json booking_form;
+        booking_form["username"] = this->active_username;
+        booking_form["room_number"] = room_number;
+        booking_form["bed_count"] = bed_count;
+        booking_form["check_in_date"] = check_in_date;
+        booking_form["checkout_date"] = checkout_date;
+        json request = create_request(booking_form, "book_room");
+        this->conn->connector_send(request);
+        response = this->conn->connector_receive();
+        return response;
+    }
 }
 
 json Client::view_user_information(vector<string> tokens)

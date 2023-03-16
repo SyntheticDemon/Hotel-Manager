@@ -69,7 +69,7 @@ json logout_response(json request, Server *serv)
     {
         if (target_user.at("logged_in") == true)
         {
-            response["code"] = 230;
+            response["code"] = 201;
             response["message"] = "Logged out succesfully";
             json target_user = search_json(username, "user", "users", serv->get_users());
             target_user["logged_in"] = false;
@@ -345,7 +345,7 @@ json signup_check_response(json request, Server *serv)
     if (search_json(request.at("payload").at("username"), "user", "users", serv->get_users()) == nullptr)
     {
         response["message"] = "Username is unique!";
-        response["code"] = 313;
+        response["code"] = 311;
     }
     else
     {

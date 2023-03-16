@@ -4,7 +4,6 @@
 #include "date.h"
 #include "logger.h"
 #include <iostream>
-#include <spdlog/spdlog.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <map>

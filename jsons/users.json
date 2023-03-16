@@ -33,11 +33,11 @@
             "address": "Jamalzade",
             "admin": "false",
             "id": 3,
-            "logged_in": false,
+            "logged_in": true,
             "password": "1",
             "phone": "09016763161",
             "phoneNumber": "00125692356",
-            "purse": "999990000",
+            "purse": "999980000",
             "user": "Pedram"
         }
     ]
