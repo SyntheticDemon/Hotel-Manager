@@ -3,7 +3,6 @@
 #include "my_utils.h"
 #include "date.h"
 #include "logger.h"
-
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -340,6 +339,7 @@ int main(int argc, char const *argv[])
     //         break;
     //     }
     // }
+    
     Server new_server = Server(configs_location, users_location, rooms_location, log_file);
 
     new_server.run();
