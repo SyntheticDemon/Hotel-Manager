@@ -1,16 +1,18 @@
 {
     "users": [
         {
+            "address": "0901",
             "admin": "true",
-            "id": 0,
+            "id": 1,
             "logged_in": false,
             "password": "admin",
+            "phone": "0901",
             "user": "Admin"
         },
         {
             "address": "Canada, Montral",
             "admin": "false",
-            "id": 1,
+            "id": 2,
             "logged_in": false,
             "password": "1234",
             "phoneNumber": "00945692356",
@@ -20,7 +22,7 @@
         {
             "address": "United States, Newyork",
             "admin": "false",
-            "id": 2,
+            "id": 4,
             "logged_in": false,
             "password": "4321",
             "phoneNumber": "00125692356",
@@ -28,13 +30,14 @@
             "user": "Jasem"
         },
         {
-            "address": "Iran, Rasht",
+            "address": "Jamalzade",
             "admin": "false",
             "id": 3,
             "logged_in": true,
-            "password": "6789",
-            "phoneNumber": "00989112659874",
-            "purse": "10",
+            "password": "1",
+            "phone": "09016763161",
+            "phoneNumber": "00125692356",
+            "purse": "999990000",
             "user": "Pedram"
         }
     ]
