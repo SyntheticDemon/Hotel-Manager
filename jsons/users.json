@@ -3,11 +3,7 @@
         {
             "admin": "true",
             "id": 0,
-<<<<<<< HEAD
-            "logged_in": true,
-=======
             "logged_in": false,
->>>>>>> 957d4cce4850e5abf3007fe3b4de8c25a62c29d3
             "password": "admin",
             "user": "Admin"
         },
@@ -35,47 +31,11 @@
             "address": "Iran, Rasht",
             "admin": "false",
             "id": 3,
-<<<<<<< HEAD
-            "logged_in": false,
-            "password": "6789",
-            "phoneNumber": "00989112659874",
-            "purse": "100",
-            "user": "Pedram"
-        },
-        {
-            "address": "shomal",
-            "id": "4",
-            "logged_in": false,
-            "password": "backpack3",
-            "phoneNumber": "09016763161",
-            "user": "pooria"
-        },
-        {
-            "address": "shomal",
-            "admin": false,
-            "id": "1",
-            "logged_in": false,
-            "password": "backpack3",
-            "phoneNumber": "09016763161",
-            "purse": "200",
-            "user": "pooria_1"
-        },
-        {
-            "address": "202",
-            "admin": false,
-            "id": "7",
-            "logged_in": false,
-            "password": "people_password",
-            "phoneNumber": "0901",
-            "purse": "5000",
-            "user": "people"
-=======
             "logged_in": true,
             "password": "6789",
             "phoneNumber": "00989112659874",
             "purse": "10",
             "user": "Pedram"
->>>>>>> 957d4cce4850e5abf3007fe3b4de8c25a62c29d3
         }
     ]
 }

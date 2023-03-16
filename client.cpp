@@ -1,12 +1,21 @@
+
+
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <string.h>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/tee.hpp>
+#include <filesystem>
+#include <bits/stdc++.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include "logger.cpp"
+#include "logger.h"
 #include <iostream>
 #define BUFFER_SIZE 10000
-#include "utils.cpp"
+#include "my_utils.h"
+#include "json_utils.h"
+
+#include <exception>
 using namespace std;
 void showMenu()
 {
@@ -116,6 +125,8 @@ public:
     Client();
     string active_username;
     vector<string> receive_and_tokenize_input();
+    void create_log_directory(string username);
+
     json logout(string username);
     json signup(vector<string> tokens);
     json login(vector<string> tokens);
@@ -125,10 +136,13 @@ public:
     json edit_information(vector<string> tokens);
     json pass_day(vector<string> tokens);
     json view_room_information(vector<string> tokens);
-    json edit_room(vector<string> tokens);
-    json move_room(vector<string> tokens);
-    json add_room(vector<string> tokens);
     json rooms_response(vector<string> tokens);
+    json leave_room(vector<string> tokens);
+    json cancel_room(vector<string> tokens);
+    string get_active_log_file() { return this->active_log_file; }
+
+private:
+    string active_log_file;
 };
 
 json create_request(json payload, json type)
@@ -163,6 +177,115 @@ json Client::all_users(vector<string> tokens)
     return response;
 }
 
+json Client::rooms_response(vector<string> tokens)
+{
+    json first_request_form;
+    first_request_form["username"] = this->active_username;
+    json first_request = create_request(first_request_form, "admin_check");
+    json first_response =
+        this->conn->connector_send(first_request);
+    first_response = this->conn->connector_receive();
+    if (first_response.at("code") == 403)
+    {
+        return first_response;
+    }
+    else
+    {
+        cout << getTime() << "Enter the rest of your command" << endl;
+        vector<string> secondery_tokens = receive_and_tokenize_input();
+        json main_request;
+        string type;
+        main_request["username"] = this->active_username;
+        main_request["room_number"] = secondery_tokens[1];
+        if (secondery_tokens[0] == "add")
+        {
+            main_request["max_capacity"] = secondery_tokens[2];
+            main_request["price"] = secondery_tokens[3];
+            type = "add_room";
+        }
+        else if (secondery_tokens[0] == "modify")
+        {
+            main_request["new_max_capacity"] = secondery_tokens[2];
+            main_request["new_price"] = secondery_tokens[3];
+            type = "modify_room";
+        }
+        else if (secondery_tokens[0] == "remove")
+        {
+            type = "remove_room";
+        }
+        else
+        {
+            json response;
+            response["code"] = 503;
+            response["message"] = "invalid input";
+            cout << getTime() << response.dump(4);
+            return response;
+        }
+        json final_request = create_request(main_request, type);
+        this->conn->connector_send(final_request);
+        json response = this->conn->connector_receive();
+        return response;
+    }
+}
+json Client::cancel_room(vector<string> tokens)
+{
+    json first_request_payload;
+    json second_response;
+    string first_type = "user_reservations";
+    first_request_payload["username"] = this->active_username;
+    json first_request = create_request(first_request_payload, first_type);
+    this->conn->connector_send(first_request);
+    json first_response = this->conn->connector_receive();
+    sleep(0.5);
+    cout << getTime() << "Pick a room to cancel out of the resulting rooms" << endl;
+    vector<string> secondery_tokens = receive_and_tokenize_input();
+    if (first_response["code"] == 200)
+    {
+        if (secondery_tokens.size() == 3)
+        {
+            json second_request_payload;
+            second_request_payload["username"] = this->active_username;
+            second_request_payload["room_number"] = secondery_tokens[1];
+            second_request_payload["bed_count"] = atoi(secondery_tokens[2].c_str());
+            json second_request = create_request(second_request_payload, "cancel_reserve");
+            this->conn->connector_send(second_request);
+            second_response = this->conn->connector_receive();
+            return second_response;
+        }
+        else
+        {
+            throw(503);
+        }
+    }
+    return second_response;
+}
+json Client::leave_room(vector<string> tokens)
+{
+    sleep(0.5);
+    cout << getTime() << "Enter the rest of your command " << endl;
+    vector<string> secondery_tokens = receive_and_tokenize_input();
+
+    json main_request;
+    string type;
+    main_request["username"] = this->active_username;
+    main_request["room_number"] = secondery_tokens[1];
+    if (secondery_tokens[0] == "room")
+    {
+        type = "leave_room";
+    }
+    else
+    {
+        json response;
+        response["code"] = 503;
+        response["message"] = "invalid input";
+        cout << getTime() << response.dump(4);
+        return response;
+    }
+    json final_request = create_request(main_request, type);
+    this->conn->connector_send(final_request);
+    json response = this->conn->connector_receive();
+    return response;
+}
 json Client::login(vector<string> tokens)
 {
     json response;
@@ -247,13 +370,13 @@ json Client::pass_day(vector<string> tokens)
     json response;
     json pass_day_form;
     int days;
-    try
+    if (tokens.size() < 2)
+    {
+        tokens[1] = 1;
+    }
+    else
     {
         days = atoi(tokens[1].c_str());
-    }
-    catch (exception)
-    {
-        days = 1;
     }
     pass_day_form["days"] = days;
     pass_day_form["username"] = this->active_username;
@@ -293,9 +416,6 @@ json Client::signup(vector<string> tokens)
         this->conn->connector_send(signup_request);
         response = this->conn->connector_receive();
     }
-    else
-    {
-    }
 
     return response;
 }
@@ -305,7 +425,7 @@ vector<string> Client::receive_and_tokenize_input()
     string input_string;
     cout << getTime() << "<< ";
     getline(std::cin, input_string);
-    vector<string> tokens = tokenize(input_string, ' ');
+    vector<string> tokens = tokenizeee(input_string, ' ');
     // inputs.push_back(tokenize(input_string));
     return tokens;
 }
@@ -316,6 +436,14 @@ Client::Client()
     this->active_username = "nil";
     this->conn = &conn;
 }
+void Client::create_log_directory(string username)
+{
+    string file_command = "mkdir -p";
+    file_command += " logs/";
+    string username_file_director = this->active_username;
+    file_command += username_file_director;
+    system(file_command.c_str());
+}
 
 void Client::run()
 {
@@ -324,6 +452,7 @@ void Client::run()
     {
         if (this->active_username != "nil")
         {
+            this->create_log_directory(this->active_username);
             showMenu();
         }
         else
@@ -336,7 +465,7 @@ void Client::run()
         {
             vector<string> tokens = receive_and_tokenize_input();
             string command = tokens[0];
-            if (command == "login")
+            if (command == "login" && tokens.size() == 3)
             {
                 response = this->login(tokens);
                 if (response.at("code") == 230)
@@ -346,7 +475,7 @@ void Client::run()
                 }
                 else if (response.at("code") == 430)
                 {
-                    this->active_username = response.at("username");
+                    this->active_username = "nil";
                 }
             }
             else if (command == "signup")
@@ -383,9 +512,17 @@ void Client::run()
             {
                 response = this->book_room(tokens);
             }
+            else if (command == "5")
+            {
+                response = this->cancel_room(tokens);
+            }
             else if (command == "7")
             {
                 response = this->edit_information(tokens);
+            }
+            else if (command == "8")
+            {
+                response = this->leave_room(tokens);
             }
             else if (command == "9")
             {
@@ -394,8 +531,8 @@ void Client::run()
             else
             {
                 throw(503);
+                // cout << getTime() << "Server Response " << response << endl;
             }
-            // cout << getTime() << "Server Response " << response << endl;
         }
         catch (int error_code)
         {
@@ -413,8 +550,17 @@ void Client::run()
 }
 int main(int argc, char const *argv[])
 {
+
     Client client = Client();
+    // typedef boost::iostreams::tee_device<std::ostream, std::ofstream> Tee;
+    // typedef boost::iostreams::stream<Tee> TeeStream;
+    // std::ofstream file("foo.out");
+    // Tee tee(std::cout, file);
+    // TeeStream both(tee);
+
     client.run();
+
+    // both << "this goes to both std::cout and foo.out" << std::endl;
     // sleep(2);
     // send(sock, hello, strlen(hello), 0);
     // sleep(2);
