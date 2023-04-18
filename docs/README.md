@@ -1,6 +1,6 @@
 Hotel Manager
 ===========================
-Run with 
+Build  with 
 ```
 make
 ```
@@ -8,6 +8,14 @@ make
 Clean with 
 ```
 make clean
+```
+Run Client with 
+```
+./Client.exe
+```
+Run server with 
+```
+./Server.exe
 ```
 
 ```
