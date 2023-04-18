@@ -1,5 +1,27 @@
 Hotel Manager
 ===========================
+This is a hotel manager , implemented in CPP. 
+Some of the available commands and their schemas
+### Signup 
+```
+signup <username to be checked >
+```
+
+### Login
+```
+login <username> <password>
+```
+### Logout 
+```
+9
+```
+### Book Room  
+```
+book_room <room_id> <bed_count> <start_date> <end_date>
+```
+### Cancel Room
+cancel <room_id> <bed_count>
+
 Build  with 
 ```
 make
