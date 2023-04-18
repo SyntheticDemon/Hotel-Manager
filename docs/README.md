@@ -42,11 +42,15 @@ Run server with
 ```
 
 810199395 Pouriya Tajmehrabi
+
 810199392 Mohammad Amin Pourzare
 
 Simple Client Server architecture
+
 JSON encoded and serialized data transfer
+
 Request Type determines corresponding server response method instead of url regex matchijng 
+
 A Wrapper around UNIX sockets manages the connection with the server and vice versa .
 
 
