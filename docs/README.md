@@ -41,22 +41,16 @@ Run server with
 ./Server.exe
 ```
 
-```
-Command directives are in the PDF of the proejct file 
-
-```
 810199395 Pouriya Tajmehrabi
 810199392 Mohammad Amin Pourzare
 
+Simple Client Server architecture
+JSON encoded and serialized data transfer
+Request Type determines corresponding server response method instead of url regex matchijng 
+A Wrapper around UNIX sockets manages the connection with the server and vice versa .
 
-معماری معماری Client server است .
-فرمت اطلاعات که بین نود های سیستم منتقل می شود json است
-کلاینت با استفاده از request-type در هر درخواستی که به سرور میفرستد مخابره می کند که از کدام یک از method ها زیر استفاده می خواهد بکند.
 
-
-یک Wrapper دور Socket زده شده است که Connection با سرور را Manage می کند
-
-کلاس Connector  در کلاینت.
+The connector class in the client 
 ![alt text](https://github.com/SyntheticDemon/CN_CHomeworks_1/blob/main/docs/images/image1.png)
 ------>  image1.png
 
