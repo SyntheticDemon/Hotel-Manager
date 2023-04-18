@@ -20,8 +20,9 @@ login <username> <password>
 book_room <room_id> <bed_count> <start_date> <end_date>
 ```
 ### Cancel Room
+```
 cancel <room_id> <bed_count>
-
+```
 Build  with 
 ```
 make
